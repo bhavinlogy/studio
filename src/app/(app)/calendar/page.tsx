@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isEqual, isToday, parseISO } from "date-fns";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isEqual, isToday, parseISO, startOfWeek, addDays } from "date-fns";
 import { ChevronLeft, ChevronRight, Filter, PlusCircle, Edit3, Trash2, UsersRound, NotebookText, FlaskConical, ClipboardList, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -41,10 +41,10 @@ export default function CalendarPage() {
     setSelectedDate(today);
   };
 
-  const daysInMonth = eachDayOfInterval({
-    start: startOfMonth(currentMonth),
-    end: endOfMonth(currentMonth),
-  });
+  const firstDayOfGrid = startOfWeek(startOfMonth(currentMonth));
+  const lastDayOfGrid = addDays(firstDayOfGrid, 41); // 6 weeks * 7 days - 1 day (for 0-indexed loop) = 41
+  const daysToDisplay = eachDayOfInterval({ start: firstDayOfGrid, end: lastDayOfGrid });
+
 
   const getEventsForDate = React.useCallback((date: Date) => {
     const dateString = format(date, "yyyy-MM-dd");
@@ -59,31 +59,48 @@ export default function CalendarPage() {
         const today = new Date();
         today.setHours(0,0,0,0); 
         const oneMonthFromToday = addMonths(today, 1);
-        return eventDate >= today && eventDate <= oneMonthFromToday;
+        // Make sure upcoming events start from the day *after* selectedDate if selectedDate is today or in the future
+        // Or from today if selectedDate is in the past or not set
+        const startDateForUpcoming = selectedDate && selectedDate >= today ? addDays(selectedDate,1) : today;
+
+        return eventDate >= startDateForUpcoming && eventDate <= oneMonthFromToday;
     })
     .sort((a,b) => parseISO(a.date).getTime() - parseISO(b.date).getTime() || a.startTime.localeCompare(b.startTime))
-    .slice(0,7), []); // Show more upcoming events
+    .slice(0,7), [selectedDate]); 
 
   const DayCellContent = ({ date, displayMonth }: { date: Date, displayMonth: Date }) => {
     const eventsOnDay = getEventsForDate(date);
     const isCurrentMonthDate = date.getMonth() === displayMonth.getMonth();
+    const isSelected = selectedDate && isEqual(date, selectedDate);
   
     const cellClasses = `
       h-full flex flex-col p-2 border border-transparent rounded-md transition-colors
-      ${isEqual(date, selectedDate || new Date(0)) ? 'border-primary bg-primary/10 shadow-inner' : ''}
-      ${!isCurrentMonthDate ? 'text-muted-foreground/30 bg-muted/20 hover:bg-muted/30' : 'hover:bg-accent/30'}
+      ${isCurrentMonthDate ?
+        (isSelected ? 'border-primary bg-primary/10 shadow-inner' : 'hover:bg-accent/30') :
+        (isSelected ? 'border-primary/40 bg-muted/40 shadow-inner' : 'bg-muted/20 hover:bg-muted/30')
+      }
     `;
     
     const dayNumberClasses = `
       self-start mb-1 text-xs sm:text-sm
       ${isToday(date) && isCurrentMonthDate ? 'bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold' : ''}
+      ${!isCurrentMonthDate ? 'text-muted-foreground/60' : ''}
     `;
 
     return (
       <TooltipProvider delayDuration={150}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className={cellClasses}>
+            <div 
+              className={cellClasses} 
+              onClick={() => {
+                setSelectedDate(date);
+                // Optional: If user clicks a day from another month, switch to that month
+                // if (!isCurrentMonthDate) {
+                //   setCurrentMonth(startOfMonth(date));
+                // }
+              }}
+            >
               <span className={dayNumberClasses}>
                 {format(date, "d")}
               </span>
@@ -187,20 +204,13 @@ export default function CalendarPage() {
                 ))}
               </div>
               <div className="grid grid-cols-7 grid-rows-6 flex-1 gap-px bg-border overflow-y-auto">
-                {Array.from({ length: getDay(startOfMonth(currentMonth)) }).map((_, i) => (
-                   <div key={`empty-start-${i}`} className="bg-muted/20 min-h-[calc((100vh-330px)/6)] sm:min-h-[calc((100vh-360px)/6)] md:min-h-[100px] lg:min-h-[120px]"></div>
-                ))}
-                {daysInMonth.map((day) => (
+                {daysToDisplay.map((day) => (
                   <div 
-                    key={day.toString()} 
-                    onClick={() => setSelectedDate(day)}
+                    key={day.toISOString()} 
                     className="bg-card cursor-pointer min-h-[calc((100vh-330px)/6)] sm:min-h-[calc((100vh-360px)/6)] md:min-h-[100px] lg:min-h-[120px]"
                   >
                     <DayCellContent date={day} displayMonth={currentMonth} />
                   </div>
-                ))}
-                {Array.from({ length: 42 - (getDay(startOfMonth(currentMonth)) + daysInMonth.length) }).map((_, i) => ( 
-                    <div key={`empty-end-${i}`} className="bg-muted/20 min-h-[calc((100vh-330px)/6)] sm:min-h-[calc((100vh-360px)/6)] md:min-h-[100px] lg:min-h-[120px]"></div>
                 ))}
               </div>
             </CardContent>
@@ -215,30 +225,33 @@ export default function CalendarPage() {
         {/* Sidebar for Event Details */}
         <div className="w-full lg:w-80 xl:w-96 flex-shrink-0">
           <Card className="shadow-lg rounded-lg h-full flex flex-col max-h-[80vh] lg:max-h-none">
-            <CardHeader className="pb-3 pt-4 px-4">
+             <CardHeader className="pb-3 pt-4 px-4">
               <CardTitle className="text-base sm:text-lg">
-                {selectedDate ? format(selectedDate, "EEEE, MMMM dd") : "Event Details & Upcoming"}
+                {selectedDate ? format(selectedDate, "EEEE, MMMM dd") : "Upcoming & Schedule"}
               </CardTitle>
               {!selectedDate && <CardDescription className="text-xs text-muted-foreground">Select a day to see its schedule.</CardDescription>}
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto p-4 pt-0">
               <div className="space-y-4">
-                {selectedDate && (
+                {selectedDate && selectedDayEvents.length > 0 && (
                   <div>
-                    {selectedDayEvents.length > 0 ? (
-                      <div className="space-y-3">
-                        {selectedDayEvents.map(event => (<EventCard key={event.id} event={event} />))}
-                      </div>
-                    ) : (
-                      <p className="text-xs sm:text-sm text-muted-foreground pt-2">No events scheduled for this day.</p>
-                    )}
+                    {/* <h3 className="text-sm font-semibold text-muted-foreground mb-2 pt-2">
+                      {format(selectedDate, "MMMM dd")} Schedule
+                    </h3> */}
+                    <div className="space-y-3">
+                      {selectedDayEvents.map(event => (<EventCard key={event.id} event={event} />))}
+                    </div>
                   </div>
+                )}
+                
+                {selectedDate && selectedDayEvents.length === 0 && (
+                   <p className="text-xs sm:text-sm text-muted-foreground pt-2">No events scheduled for this day.</p>
                 )}
 
                 {upcomingEvents.length > 0 && (
                   <div>
-                    {(selectedDate && selectedDayEvents.length > 0 && upcomingEvents.length > 0) && <Separator className="my-4" />}
-                    <h3 className="text-sm font-semibold text-muted-foreground pt-2 mb-3">
+                    {(selectedDate && selectedDayEvents.length > 0) && <Separator className="my-4" />}
+                     <h3 className="text-sm font-semibold text-muted-foreground pt-2 mb-3">
                       Upcoming Events
                     </h3>
                     <div className="space-y-3">
@@ -249,11 +262,10 @@ export default function CalendarPage() {
                   </div>
                 )}
 
-                {!selectedDate && upcomingEvents.length === 0 && (
-                   <p className="text-xs sm:text-sm text-muted-foreground pt-2">No upcoming events in the next month. Select a day to see its schedule.</p>
-                )}
-                 {selectedDate && selectedDayEvents.length === 0 && upcomingEvents.length === 0 && (
-                   <p className="text-xs sm:text-sm text-muted-foreground pt-2">No events for this day and no upcoming events found in the next month.</p>
+                {(!selectedDate || selectedDayEvents.length === 0) && upcomingEvents.length === 0 && (
+                   <p className="text-xs sm:text-sm text-muted-foreground pt-2">
+                     {selectedDate ? "No events for this day and no upcoming events." : "Select a day to see its schedule. No upcoming events."}
+                   </p>
                 )}
               </div>
             </CardContent>
@@ -310,5 +322,4 @@ function EventCard({ event, showDate = false }: EventCardProps) {
     </div>
   );
 }
-
     
