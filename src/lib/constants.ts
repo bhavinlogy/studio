@@ -1,3 +1,4 @@
+
 import type { NavItem, TaskStatus, TaskPriority } from '@/types';
 import { LayoutDashboard, ListChecks, Users, Settings, CalendarDays, BadgeCent, GanttChartSquare } from 'lucide-react';
 
@@ -43,6 +44,8 @@ export const NAV_ITEMS_SETTINGS: NavItem[] = [
 export const TASK_STATUSES: TaskStatus[] = ['To Do', 'In Progress', 'Blocked', 'Done', 'Cancelled'];
 export const TASK_PRIORITIES: TaskPriority[] = ['Low', 'Medium', 'High', 'Urgent'];
 
+export const USER_ROLES: string[] = ['Admin', 'Project Manager', 'Lead Developer', 'Developer', 'UX Designer', 'QA Tester', 'Intern'];
+
 export const STATUS_COLORS: Record<TaskStatus, string> = {
   'To Do': 'bg-gray-500 hover:bg-gray-600',
   'In Progress': 'bg-blue-500 hover:bg-blue-600',
@@ -63,3 +66,4 @@ export const PRIORITY_COLORS: Record<TaskPriority, string> = {
 // Sidebar background could be a very light shade of primary or a neutral off-white.
 // Let's make sidebar primary color stand out for active items.
 // Example: if main background is light gray, sidebar could be white or a slightly darker/contrasting shade.
+

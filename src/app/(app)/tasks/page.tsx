@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import type { Task, TaskStatus, TaskPriority } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link"; // Import Link
 
 // Mock data for tasks
 const mockTasks: Task[] = [
@@ -62,10 +64,14 @@ export default function TasksPage() {
         title="Task Management"
         description="Organize, track, and manage all your team's tasks."
         actions={
-          <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Task
-          </Button>
+          <Link href="/tasks/new" passHref>
+            <Button size="sm" asChild>
+              <span> {/* Extra span needed for Button asChild with Icon */}
+                <PlusCircle className="mr-2 h-4 w-4" />
+                New Task
+              </span>
+            </Button>
+          </Link>
         }
       />
       <DataTable

@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -5,9 +6,10 @@ import { PageHeader } from "@/components/common/page-header";
 import { DataTable } from "@/components/common/data-table";
 import { teamColumns } from "@/components/team/columns";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import type { TeamMember } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link"; // Import Link
 
 // Mock data for team members
 const mockTeamMembers: TeamMember[] = [
@@ -42,10 +44,14 @@ export default function TeamPage() {
         title="Team Directory"
         description="View and manage your team members."
         actions={
-          <Button size="sm">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Invite Member
-          </Button>
+          <Link href="/team/invite" passHref>
+            <Button size="sm" asChild>
+              <span> {/* Extra span needed for Button asChild with Icon */}
+                <UserPlus className="mr-2 h-4 w-4" />
+                Invite Member
+              </span>
+            </Button>
+          </Link>
         }
       />
       <DataTable
