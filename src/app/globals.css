@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,83 +9,87 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 91%; /* #E8E8E8 Light Gray */
-    --foreground: 0 0% 15%; /* Dark Gray for text on light gray background */
+    --background: 240 5% 96%; /* Light Grayish Blue, similar to image overall background */
+    --foreground: 240 10% 10%; /* Dark Blue-Gray for text */
 
-    --card: 0 0% 96%; /* Slightly off-white for cards, distinct from background */
-    --card-foreground: 0 0% 15%;
+    --card: 0 0% 100%; /* White for cards */
+    --card-foreground: 240 10% 10%; /* Dark Blue-Gray text on cards */
 
     --popover: 0 0% 100%; /* White for popovers */
-    --popover-foreground: 0 0% 15%;
+    --popover-foreground: 240 10% 10%;
 
-    --primary: 190 36% 44%; /* #468B97 Professional Blue */
+    --primary: 250 70% 60%; /* A vibrant purple, similar to #7C3AED */
     --primary-foreground: 0 0% 98%; /* White/Off-white for text on primary */
 
-    --secondary: 0 0% 85%; /* Medium Gray */
-    --secondary-foreground: 0 0% 10%; /* Darker gray for text on secondary */
+    --secondary: 240 5% 90%; /* Lighter Grayish Blue for secondary elements */
+    --secondary-foreground: 240 8% 30%; /* Darker text for secondary */
 
-    --muted: 0 0% 95%; /* Very Light Gray for muted elements */
-    --muted-foreground: 0 0% 40%; /* Medium-Dark Gray for muted text */
+    --muted: 240 5% 96%; /* Same as background for muted elements that blend in */
+    --muted-foreground: 240 5% 45%; /* Medium Grayish Blue for muted text */
 
-    --accent: 173 34% 55%; /* #64B6AC Complementary Teal */
-    --accent-foreground: 0 0% 98%; /* White/Off-white for text on accent */
+    --accent: 250 70% 70%; /* A slightly lighter/softer purple for accent */
+    --accent-foreground: 0 0% 98%; /* White/Off-white text on accent */
 
     --destructive: 0 84.2% 60.2%; /* Default Destructive Red */
     --destructive-foreground: 0 0% 98%; /* Default Destructive Foreground (White) */
 
-    --border: 0 0% 80%; /* Gray for borders */
-    --input: 0 0% 88%; /* Lighter Gray for input backgrounds or borders */
-    --ring: 190 36% 44%; /* Primary color for focus rings */
+    --border: 240 5% 85%; /* Light Grayish Blue border */
+    --input: 240 5% 90%; /* Slightly darker input background or border */
+    --ring: 250 70% 60%; /* Primary color for focus rings */
 
-    --chart-1: 190 36% 44%; /* Primary */
-    --chart-2: 173 34% 55%; /* Accent */
-    --chart-3: 210 30% 50%; /* A lighter, different blue */
+    --chart-1: 250 70% 60%; /* Primary */
+    --chart-2: 250 70% 70%; /* Accent */
+    --chart-3: 220 60% 65%; /* A lighter, different blue/purple */
     --chart-4: 30 80% 60%; /* An orange for contrast */
-    --chart-5: 150 30% 50%; /* A green */
+    --chart-5: 150 40% 55%; /* A green */
 
     --radius: 0.5rem;
 
     /* Sidebar colors based on the new theme */
-    --sidebar-background: 0 0% 98%; /* Off-white, clean and professional */
-    --sidebar-foreground: 0 0% 20%; /* Dark gray for text */
-    --sidebar-primary: 190 36% 44%; /* Main primary color */
-    --sidebar-primary-foreground: 0 0% 98%; /* Main primary foreground */
-    --sidebar-accent: 173 34% 55%; /* Main accent color for hover/active states */
-    --sidebar-accent-foreground: 0 0% 98%; /* Main accent foreground */
-    --sidebar-border: 0 0% 85%; /* Consistent border color */
-    --sidebar-ring: 190 36% 44%; /* Main primary color for focus rings */
+    --sidebar-background: 0 0% 100%; /* White sidebar */
+    --sidebar-foreground: 240 10% 25%; /* Dark text for sidebar */
+    --sidebar-primary: 250 70% 60%; /* New primary for active items */
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 250 70% 70%; /* New accent for hover */
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 5% 90%;
+    --sidebar-ring: 250 70% 60%;
   }
 
   .dark {
-    /* Keeping default dark mode values for now, can be adjusted if dark mode is a focus */
+    /* Dark mode adjustments for new purple theme */
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 190 36% 50%; /* Slightly lighter blue for dark mode */
-    --primary-foreground: 0 0% 10%;
+
+    --primary: 250 70% 65%; /* Slightly adjusted purple for dark mode */
+    --primary-foreground: 0 0% 10%; /* Dark text on primary in dark mode */
+    
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 173 34% 60%; /* Slightly lighter teal for dark mode */
-    --accent-foreground: 0 0% 10%;
+
+    --accent: 250 70% 75%; /* Lighter accent for dark mode */
+    --accent-foreground: 0 0% 10%; /* Dark text on accent in dark mode */
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 190 36% 50%;
+    --ring: 250 70% 65%; /* Primary ring color for dark mode */
     
     --sidebar-background: 240 6% 10%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 190 36% 50%;
+    --sidebar-primary: 250 70% 65%;
     --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 173 34% 60%;
+    --sidebar-accent: 250 70% 75%;
     --sidebar-accent-foreground: 0 0% 10%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 190 36% 50%;
+    --sidebar-ring: 250 70% 65%;
   }
 }
 
