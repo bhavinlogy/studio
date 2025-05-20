@@ -36,13 +36,12 @@ export default function CalendarPage() {
   const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
   const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const handleToday = () => {
-    const today = new Date();
-    setCurrentMonth(startOfMonth(today));
-    setSelectedDate(today);
+    const todayDate = new Date();
+    setCurrentMonth(startOfMonth(todayDate));
+    setSelectedDate(todayDate);
   };
 
   const firstDayOfGrid = startOfWeek(startOfMonth(currentMonth));
-  // Ensure we always render 6 weeks (42 days) for a consistent grid layout
   const daysToDisplay = eachDayOfInterval({ start: firstDayOfGrid, end: addDays(firstDayOfGrid, 41) });
 
 
@@ -53,18 +52,28 @@ export default function CalendarPage() {
   
   const selectedDayEvents = selectedDate ? getEventsForDate(selectedDate) : [];
   
-  const upcomingEvents = React.useMemo(() => mockEvents
-    .filter(event => {
-        const eventDate = parseISO(event.date);
-        const today = new Date();
-        today.setHours(0,0,0,0); 
-        const oneMonthFromToday = addMonths(today, 1);
-        const startDateForUpcoming = selectedDate && selectedDate >= today ? addDays(selectedDate,1) : today;
+  const upcomingEvents = React.useMemo(() => {
+    const clientToday = new Date();
+    clientToday.setHours(0,0,0,0); 
 
-        return eventDate >= startDateForUpcoming && eventDate <= oneMonthFromToday;
-    })
-    .sort((a,b) => parseISO(a.date).getTime() - parseISO(b.date).getTime() || a.startTime.localeCompare(b.startTime))
-    .slice(0,7), [selectedDate]); 
+    let startPointForUpcoming: Date;
+    if (selectedDate && selectedDate >= clientToday) {
+      startPointForUpcoming = addDays(selectedDate, 1);
+    } else {
+      startPointForUpcoming = clientToday;
+    }
+    startPointForUpcoming.setHours(0,0,0,0); // Ensure it's start of day
+
+    return mockEvents
+      .filter(event => {
+          const eventDate = parseISO(event.date);
+          eventDate.setHours(0,0,0,0); // Compare date part only
+          return eventDate >= startPointForUpcoming;
+      })
+      .sort((a,b) => parseISO(a.date).getTime() - parseISO(b.date).getTime() || a.startTime.localeCompare(b.startTime))
+      .slice(0,7); // Show next 7 upcoming events
+  }, [selectedDate]);
+
 
   const DayCellContent = ({ date, displayMonth }: { date: Date, displayMonth: Date }) => {
     const isCurrentMonthDate = isSameMonth(date, displayMonth);
@@ -75,18 +84,19 @@ export default function CalendarPage() {
       h-full flex flex-col p-2 border border-transparent rounded-md transition-colors cursor-pointer
       ${isCurrentMonthDate ?
         (isSelected ? 'border-primary bg-primary/10 shadow-inner' : 'hover:bg-accent/30') :
-        (isSelected ? 'border-primary/40 bg-muted/40 shadow-inner' : 'bg-muted/20 hover:bg-muted/30')
+        (isSelected ? 'border-primary/40 bg-muted/40 shadow-inner' : 'bg-card hover:bg-muted/30') 
       }
-      ${!isCurrentMonthDate ? 'bg-card hover:bg-muted/30' : ''} 
+       ${!isCurrentMonthDate && !isSelected ? 'text-muted-foreground/60' : ''} 
     `;
     
     const dayNumberClasses = `
       self-start mb-1 text-xs sm:text-sm
       ${isToday(date) && isCurrentMonthDate ? 'bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold' : ''}
-      ${!isCurrentMonthDate ? 'text-muted-foreground/60' : ''}
+      ${!isCurrentMonthDate && !isSelected ? 'text-muted-foreground/60' : ''}
+      ${!isCurrentMonthDate && isSelected ? 'text-foreground/80' : ''}
     `;
 
-    const dayCellContent = (
+    const dayCellRenderContent = (
       <div 
         className={cellClasses} 
         onClick={() => {
@@ -121,7 +131,7 @@ export default function CalendarPage() {
         <TooltipProvider delayDuration={150}>
           <Tooltip>
             <TooltipTrigger asChild>
-              {dayCellContent}
+              {dayCellRenderContent}
             </TooltipTrigger>
             <TooltipContent className="bg-card shadow-xl p-3 border rounded-md w-64">
               <p className="font-semibold text-sm mb-2 text-foreground">{format(date, "MMMM d, yyyy")}</p>
@@ -141,7 +151,7 @@ export default function CalendarPage() {
         </TooltipProvider>
       );
     }
-    return dayCellContent; // Render without tooltip if no events or not current month
+    return dayCellRenderContent; // Render without tooltip if no events or not current month
   };
 
   return (
@@ -226,7 +236,7 @@ export default function CalendarPage() {
         )}
 
         {/* Sidebar for Event Details */}
-        <div className="w-full lg:w-72 xl:w-80 flex-shrink-0"> {/* Adjusted width */}
+        <div className="w-full lg:w-72 xl:w-80 flex-shrink-0">
           <Card className="shadow-lg rounded-lg h-full flex flex-col max-h-[80vh] lg:max-h-none">
              <CardHeader className="pb-3 pt-4 px-4">
               <CardTitle className="text-base sm:text-lg">
@@ -323,5 +333,3 @@ function EventCard({ event, showDate = false }: EventCardProps) {
   );
 }
     
-
-  
