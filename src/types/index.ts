@@ -55,5 +55,7 @@ export interface CalendarEvent {
   type: CalendarEventType;
   color: string; // Tailwind background color class e.g. 'bg-purple-500'
   icon: LucideIcon;
-  attendees?: { id: string; name: string; avatarUrl?: string }[];
+  attendees?: { id: string; name: string; avatarUrl?: string; dataAiHint?: string }[];
 }
+
+    
