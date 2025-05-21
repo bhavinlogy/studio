@@ -1,6 +1,6 @@
 
-import type { NavItem, TaskStatus, TaskPriority } from '@/types';
-import { LayoutDashboard, ListChecks, Users, Settings, CalendarDays, BadgeCent, GanttChartSquare } from 'lucide-react';
+import type { NavItem, TaskStatus, TaskPriority, ProjectStatus } from '@/types';
+import { LayoutDashboard, ListChecks, Users, Settings, CalendarDays, FolderKanban } from 'lucide-react';
 
 export const APP_NAME = 'TaskPilot';
 
@@ -10,6 +10,12 @@ export const NAV_ITEMS_MAIN: NavItem[] = [
     href: '/dashboard',
     icon: LayoutDashboard,
     description: 'Overview of your tasks and team activity.',
+  },
+  {
+    title: 'Projects',
+    href: '/projects',
+    icon: FolderKanban, // Added new icon
+    description: 'Manage all your projects.',
   },
   {
     title: 'Tasks',
@@ -44,13 +50,21 @@ export const NAV_ITEMS_SETTINGS: NavItem[] = [
 export const TASK_STATUSES: TaskStatus[] = ['To Do', 'In Progress', 'Blocked', 'Done', 'Cancelled'];
 export const TASK_PRIORITIES: TaskPriority[] = ['Low', 'Medium', 'High', 'Urgent'];
 
+export const PROJECT_STATUSES: ProjectStatus[] = ['Planning', 'Active', 'On Hold', 'Completed', 'Cancelled'];
+
 export const USER_ROLES: string[] = ['Admin', 'Project Manager', 'Lead Developer', 'Developer', 'UX Designer', 'QA Tester', 'Intern'];
 
-export const STATUS_COLORS: Record<TaskStatus, string> = {
+export const STATUS_COLORS: Record<TaskStatus | ProjectStatus, string> = {
+  // Task Statuses
   'To Do': 'bg-gray-500 hover:bg-gray-600',
   'In Progress': 'bg-blue-500 hover:bg-blue-600',
   'Blocked': 'bg-orange-500 hover:bg-orange-600',
   'Done': 'bg-green-500 hover:bg-green-600',
+  // Project Statuses (can share or have distinct colors)
+  'Planning': 'bg-purple-500 hover:bg-purple-600',
+  'Active': 'bg-sky-500 hover:bg-sky-600',
+  'On Hold': 'bg-yellow-500 hover:bg-yellow-600 text-black', // Ensuring contrast for yellow
+  'Completed': 'bg-green-600 hover:bg-green-700', // Slightly different green for distinction
   'Cancelled': 'bg-red-500 hover:bg-red-600',
 };
 
@@ -60,10 +74,3 @@ export const PRIORITY_COLORS: Record<TaskPriority, string> = {
   'High': 'bg-orange-500 hover:bg-orange-600',
   'Urgent': 'bg-red-500 hover:bg-red-600',
 };
-
-// Use a more distinct color for sidebar background to ensure it is visible against main content background
-// Primary: #468B97, Background: #E8E8E8, Accent: #64B6AC.
-// Sidebar background could be a very light shade of primary or a neutral off-white.
-// Let's make sidebar primary color stand out for active items.
-// Example: if main background is light gray, sidebar could be white or a slightly darker/contrasting shade.
-

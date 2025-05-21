@@ -21,6 +21,7 @@ export type Task = {
   dueDate?: string; // ISO date string
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
+  projectId?: string; // Optional: link task to a project
 };
 
 export type TeamMember = {
@@ -58,4 +59,19 @@ export interface CalendarEvent {
   attendees?: { id: string; name: string; avatarUrl?: string; dataAiHint?: string }[];
 }
 
-    
+export type ProjectStatus = 'Planning' | 'Active' | 'On Hold' | 'Completed' | 'Cancelled';
+
+export type Project = {
+  id: string;
+  name: string;
+  description?: string;
+  status: ProjectStatus;
+  startDate?: string; // ISO date string
+  endDate?: string; // ISO date string
+  owner: Pick<User, "id" | "name" | "avatarUrl">; // Simplified owner info
+  teamMemberIds?: string[]; // For linking to TeamMember IDs
+  // For more complex scenarios, you might have an array of User objects
+  // tasks?: Pick<Task, "id" | "title" | "status">[]; // Simplified task info
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+};
